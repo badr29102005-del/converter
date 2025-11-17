@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محول العملات - ABDOILMSREY</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header { text-align: center; color: white; margin-bottom: 20px; }
+        .header h1 { font-size: 32px; margin-bottom: 10px; }
+        .owner-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .currency-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        input:focus, select:focus { outline: none; border-color: #667eea; }
+        .swap-button {
+            display: block;
+            margin: 20px auto;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s, background 0.3s;
+        }
+        .swap-button:hover { background: #5568d3; transform: scale(1.05); }
+        .result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .rate-info { text-align: center; color: #666; margin-top: 15px; font-size: 14px; }
+        .input-group { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👑 محول العملات الملكي 👑</h1>
+        <div class="owner-badge"><span>مملوك بواسطة: ABDOILMSREY</span></div>
+    </div>
+    <div class="container">
+        <div class="currency-box">
+            <div class="input-group">
+                <label for="amount">المبلغ:</label>
+                <input type="number" id="amount" placeholder="أدخل المبلغ" value="100">
+            </div>
+            <div class="input-group">
+                <label for="fromCurrency">من عملة:</label>
+                <select id="fromCurrency"></select>
+            </div>
+        </div>
+        <button class="swap-button" onclick="swapCurrencies()">⇅ تبديل</button>
+        <div class="currency-box">
+            <div class="input-group">
+                <label for="toCurrency">إلى عملة:</label>
+                <select id="toCurrency"></select>
+            </div>
+        </div>
+        <div class="result" id="result">النتيجة ستظهر هنا</div>
+        <div class="rate-info" id="rateInfo"></div>
+    </div>
+    <script>
+        const exchangeRates = {
+            USD: { name: 'دولار أمريكي', rate: 1 },
+            EUR: { name: 'يورو', rate: 0.92 },
+            GBP: { name: 'جنيه إسترليني', rate: 0.79 },
+            SAR: { name: 'ريال سعودي', rate: 3.75 },
+            AED: { name: 'درهم إماراتي', rate: 3.67 },
+            EGP: { name: 'جنيه مصري', rate: 49.5 },
+            JPY: { name: 'ين ياباني', rate: 149.5 },
+            CNY: { name: 'يوان صيني', rate: 7.24 }
+        };
+        function updateCurrencySelects() {
+            const fromSelect = document.getElementById('fromCurrency');
+            const toSelect = document.getElementById('toCurrency');
+            for (const [code, data] of Object.entries(exchangeRates)) {
+                fromSelect.add(new Option(`${data.name} (${code})`, code));
+                toSelect.add(new Option(`${data.name} (${code})`, code));
+            }
+            fromSelect.value = 'USD';
+            toSelect.value = 'EUR';
+        }
+        function convertCurrency() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+            if (isNaN(amount) || amount <= 0) {
+                document.getElementById('result').textContent = 'الرجاء إدخال مبلغ صحيح';
+                document.getElementById('rateInfo').textContent = '';
+                return;
+            }
+            const amountInUSD = amount / exchangeRates[fromCurrency].rate;
+            const convertedAmount = amountInUSD * exchangeRates[toCurrency].rate;
+            const rate = exchangeRates[toCurrency].rate / exchangeRates[fromCurrency].rate;
+            document.getElementById('result').textContent = `${amount.toFixed(2)} ${fromCurrency} = ${convertedAmount.toFixed(2)} ${toCurrency}`;
+            document.getElementById('rateInfo').textContent = `سعر الصرف: 1 ${fromCurrency} = ${rate.toFixed(4)} ${toCurrency}`;
+        }
+        function swapCurrencies() {
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+            document.getElementById('fromCurrency').value = toCurrency;
+            document.getElementById('toCurrency').value = fromCurrency;
+            convertCurrency();
+        }
+        document.getElementById('amount').addEventListener('input', convertCurrency);
+        document.getElementById('fromCurrency').addEventListener('change', convertCurrency);
+        document.getElementById('toCurrency').addEventListener('change', convertCurrency);
+        updateCurrencySelects();
+        convertCurrency();
+    </script>
+</body>
+</html>
